@@ -57,11 +57,22 @@ if [[ -n "$AUTO_DEVOPS_BUILD_IMAGE_CNB_ENABLED" && ! -f Dockerfile ]]; then
   exit 0
 fi
 
-if [[ -f Dockerfile ]]; then
-  echo "Building Dockerfile-based application..."
+if [[ -n "${DOCKERFILE_PATH}" ]]; then
+  echo "Building Dockerfile-based application using '${DOCKERFILE_PATH}'..."
 else
-  echo "Building Heroku-based application using gliderlabs/herokuish docker image..."
-  erb -T - /build/Dockerfile.erb > Dockerfile
+  export DOCKERFILE_PATH="Dockerfile"
+
+  if [[ -f "${DOCKERFILE_PATH}" ]]; then
+    echo "Building Dockerfile-based application..."
+  else
+    echo "Building Heroku-based application using gliderlabs/herokuish docker image..."
+    erb -T - /build/Dockerfile.erb > "${DOCKERFILE_PATH}"
+  fi
+fi
+
+if [[ ! -f "${DOCKERFILE_PATH}" ]]; then
+  echo "Unable to find '${DOCKERFILE_PATH}'. Exiting..." >&2
+  exit 1
 fi
 
 build_secret_args=''
@@ -85,6 +96,7 @@ docker build \
   --cache-from "$image_previous" \
   --cache-from "$image_latest" \
   $build_secret_args \
+  -f "$DOCKERFILE_PATH" \
   --build-arg BUILDPACK_URL="$BUILDPACK_URL" \
   --build-arg HTTP_PROXY="$HTTP_PROXY" \
   --build-arg http_proxy="$http_proxy" \

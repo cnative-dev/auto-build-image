@@ -112,6 +112,23 @@ test-cnb-with-buildpack-url:
     - grep 'Building Cloud Native Buildpack-based application with builder' /tmp/build-output
     - grep "Using default config from Elixir buildpack" /tmp/build-output
 
+test-custom-dockerfile:
+  extends: .test-build
+  variables:
+    DOCKERFILE_PATH: "build/Dockerfile"
+  script:
+    - cd "$CI_PROJECT_DIR/test/ruby_with_custom_dockerfile"
+    - /build/build.sh | tee /tmp/build-output
+    - grep "Building Dockerfile-based application using 'build/Dockerfile'" /tmp/build-output
+
+test-custom-dockerfile-should-fail:
+  extends: .test-build
+  variables:
+    DOCKERFILE_PATH: "non-existing-file"
+  script:
+    - cd "$CI_PROJECT_DIR/test/ruby_with_custom_dockerfile"
+    - /build/build.sh && exit 1 || exit 0
+
 test-rspec:
   stage: test
   image: "$BUILD_IMAGE_NAME"
