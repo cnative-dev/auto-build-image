@@ -74,10 +74,10 @@ if [[ -n "$AUTO_DEVOPS_BUILD_IMAGE_FORWARDED_CI_VARIABLES" ]]; then
   export DOCKER_BUILDKIT=1
 fi
 
-# pull images for cache - this is required, otherwise --cache-from will not work
-docker image pull "$image_previous" || \
-  docker image pull "$image_latest" || \
-  true
+echo "Attempting to pull a previously built image for use with --cache-from..."
+docker image pull --quiet "$image_previous" || \
+  docker image pull --quiet "$image_latest" || \
+  echo "No previously cached image found. The docker build will proceed without using a cached image"
 
 # shellcheck disable=SC2154 # missing variable warning for the lowercase variables
 # shellcheck disable=SC2086 # double quoting for globbing warning for $build_secret_args and $AUTO_DEVOPS_BUILD_IMAGE_EXTRA_ARGS
