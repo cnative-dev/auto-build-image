@@ -6,7 +6,7 @@
   script:
     - semantic-release $DRY_RUN_OPT -b $CI_COMMIT_REF_NAME
   rules:
-    - if: $CI_API_V4_URL == "https://gitlab.com/api/v4"
+    - if: $CI_SERVER_HOST == "gitlab.com"
 
 release-tag:
   stage: release
@@ -30,11 +30,11 @@ publish:
   extends: .semantic-release
   rules:
     # Only protected branches on the official project
-    - if: $CI_COMMIT_BRANCH && $CI_COMMIT_REF_PROTECTED == 'true' && $CI_PROJECT_PATH == 'gitlab-org/cluster-integration/auto-build-image' && $CI_API_V4_URL == "https://gitlab.com/api/v4"
+    - if: $CI_COMMIT_BRANCH && $CI_COMMIT_REF_PROTECTED == 'true' && $CI_PROJECT_PATH == 'gitlab-org/cluster-integration/auto-build-image' && $CI_SERVER_HOST == "gitlab.com"
 
 publish-dryrun:
   extends: .semantic-release
   variables:
     DRY_RUN_OPT: '-d'
   rules:
-    - if: $CI_MERGE_REQUEST_IID && $CI_PROJECT_PATH == 'gitlab-org/cluster-integration/auto-build-image' && $CI_API_V4_URL == "https://gitlab.com/api/v4"
+    - if: $CI_MERGE_REQUEST_IID && $CI_PROJECT_PATH == 'gitlab-org/cluster-integration/auto-build-image' && $CI_SERVER_HOST == "gitlab.com"
