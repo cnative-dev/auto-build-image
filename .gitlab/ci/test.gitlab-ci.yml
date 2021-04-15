@@ -147,3 +147,14 @@ test-rubocop:
     - bundle install --without test
   script:
     - bundle exec rubocop Gemfile src spec
+
+commitlint:
+  stage: test
+  image: node:12
+  needs: []
+  before_script:
+    - npm install
+  script:
+    - npx --quiet commitlint --from="$CI_MERGE_REQUEST_DIFF_BASE_SHA" --help-url 'https://gitlab.com/gitlab-org/cluster-integration/auto-build-image#git-commit-guidelines'
+  rules:
+    - if: "$CI_MERGE_REQUEST_EVENT_TYPE != 'merge_train' && $CI_MERGE_REQUEST_DIFF_BASE_SHA"
