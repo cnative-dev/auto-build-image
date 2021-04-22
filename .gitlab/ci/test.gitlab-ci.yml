@@ -10,6 +10,8 @@ test-shellcheck:
   image: "$BUILD_IMAGE_NAME"
   services:
     - "docker:${DOCKER_VERSION}-dind"
+  tags:
+    - gitlab-org-docker
 
 test-dockerfile:
   extends: .test-build
@@ -81,6 +83,22 @@ test-herokuish-with-buildpack-url:
     - /build/build.sh | tee /tmp/build-output
     - grep 'Building Heroku-based application using gliderlabs/herokuish docker image...' /tmp/build-output
     - grep "Using default config from Elixir buildpack" /tmp/build-output
+
+# This is a smoke test for kubernetes runners to avoid regressions like
+# https://gitlab.com/gitlab-org/gitlab/-/issues/328403. It uses a runner
+# installed on the project cluster "auto-build-image-ci-runners".
+# The dind service in Jobs/Build.gitlab-ci.yml should mirror this one.
+test-dockerfile-kubernetes-runner:
+  extends: test-dockerfile
+  variables:
+    DOCKER_TLS_CERTDIR: ""
+  services:
+    - name: "docker:${DOCKER_VERSION}-dind"
+      command: ['--tls=false', '--host=tcp://0.0.0.0:2375']
+  tags:
+    - kubernetes
+  rules:
+    - if: $CI_MERGE_REQUEST_IID && $CI_PROJECT_PATH == 'gitlab-org/cluster-integration/auto-build-image' && $CI_SERVER_HOST == "gitlab.com"
 
 test-cnb-with-buildpack-url:
   extends: .test-build

@@ -1,6 +1,8 @@
 build:
   stage: build
   image: "docker:${DOCKER_VERSION}"
+  tags:
+    - gitlab-org-docker
   services:
     - "docker:${DOCKER_VERSION}-dind"
   before_script:

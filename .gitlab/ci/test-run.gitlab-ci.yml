@@ -1,9 +1,12 @@
 test-run-herokuish:
   stage: test-run
   needs: ["test-herokuish"]
+  image: alpine
   services:
     - name: "$CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG/test-herokuish:$CI_APPLICATION_TAG"
       alias: app
+  before_script:
+    - apk add wget
   script:
     - wget app:5000
     - grep 'Hello World!' index.html
@@ -11,11 +14,14 @@ test-run-herokuish:
 test-run-cnb:
   stage: test-run
   needs: ["test-cnb"]
+  image: alpine
   variables:
     AUTO_DEVOPS_BUILD_IMAGE_CNB_ENABLED: "true"
   services:
     - name: "$CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG/test-cnb:$CI_APPLICATION_TAG"
       alias: app
+  before_script:
+    - apk add wget
   script:
     - wget app:5000
     - grep 'Hello World!' index.html
