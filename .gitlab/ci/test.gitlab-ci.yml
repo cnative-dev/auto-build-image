@@ -30,6 +30,8 @@ test-redhat-registry:
 
 test-herokuish:
   extends: .test-build
+  variables:
+    AUTO_DEVOPS_BUILD_IMAGE_CNB_ENABLED: "false"
   script:
     - cd "$CI_PROJECT_DIR/test/ruby"
     - /build/build.sh | tee /tmp/build-output
@@ -37,16 +39,13 @@ test-herokuish:
 
 test-cnb:
   extends: .test-build
-  variables:
-    AUTO_DEVOPS_BUILD_IMAGE_CNB_ENABLED: "true"
   script:
     - cd "$CI_PROJECT_DIR/test/ruby"
     - /build/build.sh | tee /tmp/build-output
     - grep 'Building Cloud Native Buildpack-based application with builder' /tmp/build-output
 
-
 test-herokuish-with-build-secrets:
-  extends: .test-build
+  extends: test-herokuish
   variables:
     FORWARDED_VARIABLE_0: 'my forwarded variable 0'
     FORWARDED_VARIABLE_1: 'my forwarded variable 1'
@@ -62,7 +61,6 @@ test-herokuish-with-build-secrets:
 test-cnb-with-build-secrets:
   extends: .test-build
   variables:
-    AUTO_DEVOPS_BUILD_IMAGE_CNB_ENABLED: "true"
     FORWARDED_VARIABLE_0: 'my forwarded variable 0'
     FORWARDED_VARIABLE_1: 'my forwarded variable 1'
     AUTO_DEVOPS_BUILD_IMAGE_FORWARDED_CI_VARIABLES: FORWARDED_VARIABLE_0,FORWARDED_VARIABLE_1
@@ -75,7 +73,7 @@ test-cnb-with-build-secrets:
     - grep 'FORWARDED_VARIABLE_1="my forwarded variable 1"' /tmp/build-output
 
 test-herokuish-with-buildpack-url:
-  extends: .test-build
+  extends: test-herokuish
   variables:
     BUILDPACK_URL: https://github.com/HashNuke/heroku-buildpack-elixir.git
   script:
@@ -103,7 +101,6 @@ test-dockerfile-kubernetes-runner:
 test-cnb-with-buildpack-url:
   extends: .test-build
   variables:
-    AUTO_DEVOPS_BUILD_IMAGE_CNB_ENABLED: "true"
     BUILDPACK_URL: /tmp/elixir_buildpack
   before_script:
     # prepare CNB-compatible elixir buildpack
