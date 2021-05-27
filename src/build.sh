@@ -17,7 +17,7 @@ image_previous="$CI_APPLICATION_REPOSITORY:$CI_COMMIT_BEFORE_SHA"
 image_tagged="$CI_APPLICATION_REPOSITORY:$CI_APPLICATION_TAG"
 image_latest="$CI_APPLICATION_REPOSITORY:latest"
 
-if [[ -n "$AUTO_DEVOPS_BUILD_IMAGE_CNB_ENABLED" && ! -f Dockerfile ]]; then
+if [[ "$AUTO_DEVOPS_BUILD_IMAGE_CNB_ENABLED" != "false" && ! -f Dockerfile && -z "${DOCKERFILE_PATH}" ]]; then
   builder=${AUTO_DEVOPS_BUILD_IMAGE_CNB_BUILDER:-"heroku/buildpacks:18"}
   echo "Building Cloud Native Buildpack-based application with builder ${builder}..."
   buildpack_args=()
