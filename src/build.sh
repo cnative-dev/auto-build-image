@@ -107,7 +107,7 @@ docker build \
   --build-arg NO_PROXY="$NO_PROXY" \
   --build-arg no_proxy="$no_proxy" \
   $AUTO_DEVOPS_BUILD_IMAGE_EXTRA_ARGS \
-  --tag "$CI_APPLICATION_REPOSITORY:$CI_APPLICATION_TAG" \
+  --tag "$image_tagged" \
   --tag "$image_latest" .
 
 docker push "$image_tagged"
