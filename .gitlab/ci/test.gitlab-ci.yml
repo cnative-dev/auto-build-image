@@ -75,7 +75,7 @@ test-cnb-with-build-secrets:
 test-herokuish-with-buildpack-url:
   extends: test-herokuish
   variables:
-    BUILDPACK_URL: https://github.com/HashNuke/heroku-buildpack-elixir.git
+    BUILDPACK_URL: 'https://github.com/HashNuke/heroku-buildpack-elixir.git#381ea508063bb20467702cf79c58babaedac12fd'
   script:
     - cd "$CI_PROJECT_DIR/test/elixir"
     - /build/build.sh | tee /tmp/build-output
