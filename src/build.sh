@@ -75,40 +75,70 @@ if [[ ! -f "${DOCKERFILE_PATH}" ]]; then
   exit 1
 fi
 
-build_secret_args=''
+# By default we support DOCKER_BUILDKIT, however it can be turned off
+# by explicitly setting this to an empty string
+DOCKER_BUILDKIT=${DOCKER_BUILDKIT:-1}
+
+# shellcheck disable=SC2206
+build_args=(
+  --cache-from "$image_previous"
+  --cache-from "$image_latest"
+  -f "$DOCKERFILE_PATH"
+  --build-arg BUILDPACK_URL="$BUILDPACK_URL"
+  --build-arg HTTP_PROXY="$HTTP_PROXY"
+  --build-arg http_proxy="$http_proxy"
+  --build-arg HTTPS_PROXY="$HTTPS_PROXY"
+  --build-arg https_proxy="$https_proxy"
+  --build-arg FTP_PROXY="$FTP_PROXY"
+  --build-arg ftp_proxy="$ftp_proxy"
+  --build-arg NO_PROXY="$NO_PROXY"
+  --build-arg no_proxy="$no_proxy"
+  $AUTO_DEVOPS_BUILD_IMAGE_EXTRA_ARGS
+  --tag "$image_tagged"
+  --tag "$image_latest"
+)
+
 if [[ -n "$AUTO_DEVOPS_BUILD_IMAGE_FORWARDED_CI_VARIABLES" ]]; then
   build_secret_file_path=/tmp/auto-devops-build-secrets
   "$(dirname "$0")"/export-build-secrets > "$build_secret_file_path"
-  build_secret_args="--secret id=auto-devops-build-secrets,src=$build_secret_file_path"
+  build_args+=(
+    --secret "id=auto-devops-build-secrets,src=$build_secret_file_path"
+  )
 
-  echo 'Activating Docker BuildKit to forward CI variables with --secret'
-  export DOCKER_BUILDKIT=1
+  # Setting build time secrets always requires buildkit
+  DOCKER_BUILDKIT=1
 fi
 
-echo "Attempting to pull a previously built image for use with --cache-from..."
-docker image pull --quiet "$image_previous" || \
-  docker image pull --quiet "$image_latest" || \
-  echo "No previously cached image found. The docker build will proceed without using a cached image"
+cache_type=$AUTO_DEVOPS_BUILD_CACHE
+cache_mode=${AUTO_DEVOPS_BUILD_CACHE_MODE:-max}
+registry_ref=${AUTO_DEVOPS_BUILD_CACHE_REF:-"${CI_APPLICATION_REPOSITORY}:cache"}
 
-# shellcheck disable=SC2154 # missing variable warning for the lowercase variables
-# shellcheck disable=SC2086 # double quoting for globbing warning for $build_secret_args and $AUTO_DEVOPS_BUILD_IMAGE_EXTRA_ARGS
-docker build \
-  --cache-from "$image_previous" \
-  --cache-from "$image_latest" \
-  $build_secret_args \
-  -f "$DOCKERFILE_PATH" \
-  --build-arg BUILDPACK_URL="$BUILDPACK_URL" \
-  --build-arg HTTP_PROXY="$HTTP_PROXY" \
-  --build-arg http_proxy="$http_proxy" \
-  --build-arg HTTPS_PROXY="$HTTPS_PROXY" \
-  --build-arg https_proxy="$https_proxy" \
-  --build-arg FTP_PROXY="$FTP_PROXY" \
-  --build-arg ftp_proxy="$ftp_proxy" \
-  --build-arg NO_PROXY="$NO_PROXY" \
-  --build-arg no_proxy="$no_proxy" \
-  $AUTO_DEVOPS_BUILD_IMAGE_EXTRA_ARGS \
-  --tag "$image_tagged" \
-  --tag "$image_latest" .
+if [[ -n "$DOCKER_BUILDKIT" && "$DOCKER_BUILDKIT" != "0" ]]; then
+  case "$cache_type" in
+    inline)
+      build_args+=(--cache-to type=inline) ;;
+    registry)
+      build_args+=(
+        --cache-from "$registry_ref"
+        --cache-to "type=registry,ref=$registry_ref,mode=$cache_mode"
+      )
+      ;;
+  esac
 
-docker push "$image_tagged"
-docker push "$image_latest"
+  docker buildx create --use
+  docker buildx build \
+    "${build_args[@]}" \
+    --progress=plain \
+    --push \
+    . 2>&1
+else
+  echo "Attempting to pull a previously built image for use with --cache-from..."
+  docker image pull --quiet "$image_previous" || \
+    docker image pull --quiet "$image_latest" || \
+    echo "No previously cached image found. The docker build will proceed without using a cached image"
+
+  docker build "${build_args[@]}" .
+
+  docker push "$image_tagged"
+  docker push "$image_latest"
+fi
