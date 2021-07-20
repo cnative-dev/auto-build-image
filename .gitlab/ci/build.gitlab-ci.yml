@@ -4,18 +4,24 @@ build:
   tags:
     - gitlab-org-docker
   variables:
-    # Normally BuildKit would set this for us, but as this does not use
-    # BuildKit we'll just pass it through for it
-    TARGETARCH: amd64
+    DOCKER_BUILDKIT: "1"
+    PLATFORMS: linux/amd64,linux/arm64
   services:
     - "docker:${DOCKER_VERSION}-dind"
   before_script:
+    # Install buildx
+    - mkdir -p ~/.docker/cli-plugins
+    - wget https://github.com/docker/buildx/releases/download/v0.6.0/buildx-v0.6.0.linux-amd64 -O ~/.docker/cli-plugins/docker-buildx
+    - chmod a+x ~/.docker/cli-plugins/docker-buildx
+    # See https://www.docker.com/blog/multi-platform-docker-builds/
+    - docker run --rm --privileged docker/binfmt:a7996909642ee92942dcd6cff44b9b95f08dad64
+    # Registry auth
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
   script:
-    - docker build --build-arg DOCKER_VERSION="$DOCKER_VERSION"
-      --build-arg TARGETARCH="$TARGETARCH"
+    - docker buildx create --use
+    - docker buildx build
+      --build-arg DOCKER_VERSION="$DOCKER_VERSION"
+      --platform "$PLATFORMS"
       --tag "$BUILD_IMAGE_NAME"
-      --tag "$BUILD_IMAGE_NAME_LATEST"
+      --push
       .
-    - docker push "$BUILD_IMAGE_NAME"
-    - docker push "$BUILD_IMAGE_NAME_LATEST"

@@ -2,7 +2,7 @@ ARG DOCKER_VERSION
 
 FROM docker:${DOCKER_VERSION}
 
-ARG PACK_VERSION=v0.18.0
+ARG PACK_VERSION=v0.19.0
 
 RUN apk add --no-cache bash ruby ruby-etc wget
 RUN wget https://github.com/buildpacks/pack/releases/download/${PACK_VERSION}/pack-${PACK_VERSION}-linux.tgz && \
@@ -11,7 +11,7 @@ RUN wget https://github.com/buildpacks/pack/releases/download/${PACK_VERSION}/pa
     mv pack /usr/local/bin/pack
 
 ARG TARGETARCH
-ARG BUILDX_VERSION=v0.5.1
+ARG BUILDX_VERSION=v0.6.0
 RUN mkdir -p /usr/local/libexec/docker/cli-plugins && \
     wget https://github.com/docker/buildx/releases/download/${BUILDX_VERSION}/buildx-${BUILDX_VERSION}.linux-${TARGETARCH} \
       -O /usr/local/libexec/docker/cli-plugins/docker-buildx && \
