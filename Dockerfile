@@ -9,5 +9,13 @@ RUN wget https://github.com/buildpacks/pack/releases/download/${PACK_VERSION}/pa
     tar xvf pack-${PACK_VERSION}-linux.tgz && \
     rm pack-${PACK_VERSION}-linux.tgz && \
     mv pack /usr/local/bin/pack
+
+ARG TARGETARCH
+ARG BUILDX_VERSION=v0.5.1
+RUN mkdir -p /usr/local/libexec/docker/cli-plugins && \
+    wget https://github.com/docker/buildx/releases/download/${BUILDX_VERSION}/buildx-${BUILDX_VERSION}.linux-${TARGETARCH} \
+      -O /usr/local/libexec/docker/cli-plugins/docker-buildx && \
+    chmod a+x /usr/local/libexec/docker/cli-plugins/docker-buildx
+
 COPY src/ build/
 CMD ["/build/build.sh"]
