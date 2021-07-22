@@ -16,10 +16,10 @@ release:
   script:
     # https://github.com/google/go-containerregistry/blob/main/cmd/crane/doc/crane_copy.md
     - crane auth login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
-    - crane copy "$BUILD_IMAGE_NAME" "${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG:$CI_COMMIT_SHORT_SHA}"
+    - crane copy "$BUILD_IMAGE_NAME" "${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG}"
     - crane copy "$BUILD_IMAGE_NAME" "${CI_REGISTRY_IMAGE}:latest"
-  only:
-    - tags
+  rules:
+    - if: $CI_COMMIT_TAG
 
 publish:
   extends: .semantic-release
