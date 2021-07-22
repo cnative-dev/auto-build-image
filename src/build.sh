@@ -24,6 +24,10 @@ if [[ "$AUTO_DEVOPS_BUILD_IMAGE_CNB_ENABLED" != "false" && ! -f Dockerfile && -z
   if [[ -n "$BUILDPACK_URL" ]]; then
     buildpack_args=('--buildpack' "$BUILDPACK_URL")
   fi
+  volume_args=()
+  if [[ -n "$BUILDPACK_VOLUMES" ]]; then
+    volume_args=('--volume' "$BUILDPACK_VOLUMES")
+  fi
   env_args=()
   if [[ -n "$AUTO_DEVOPS_BUILD_IMAGE_FORWARDED_CI_VARIABLES" ]]; then
     mapfile -t env_arg_names < <(echo "$AUTO_DEVOPS_BUILD_IMAGE_FORWARDED_CI_VARIABLES" | tr ',' "\n")
@@ -35,6 +39,7 @@ if [[ "$AUTO_DEVOPS_BUILD_IMAGE_CNB_ENABLED" != "false" && ! -f Dockerfile && -z
     --builder "$builder" \
     "${env_args[@]}" \
     "${buildpack_args[@]}" \
+    "${volume_args[@]}" \
     --env HTTP_PROXY \
     --env http_proxy \
     --env HTTPS_PROXY \

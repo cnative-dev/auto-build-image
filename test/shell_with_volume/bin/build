@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+echo "Running run.sh" | sed 's/^/-----> /'
+source ./run.sh

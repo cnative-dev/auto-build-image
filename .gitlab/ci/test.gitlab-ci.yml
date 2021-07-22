@@ -193,6 +193,20 @@ test-cnb-with-buildpack-url:
     - grep 'Building Cloud Native Buildpack-based application with builder' /tmp/build-output
     - grep "Using default config from Elixir buildpack" /tmp/build-output
 
+test-cnb-with-volumes:
+  extends: .test-build
+  variables:
+    BUILDPACK_URL: .
+    SHARED_PATH: $CI_PROJECT_DIR/shared
+    BUILDPACK_VOLUMES: $CI_PROJECT_DIR/shared:/data
+  before_script:
+    - mkdir -p $SHARED_PATH
+    - echo "Successfully mounted a volume" > $SHARED_PATH/test
+  script:
+    - cd "$CI_PROJECT_DIR/test/shell_with_volume"
+    - /build/build.sh | tee /tmp/build-output
+    - grep 'Successfully mounted a volume' /tmp/build-output
+
 test-custom-dockerfile:
   extends: .test-build
   variables:
