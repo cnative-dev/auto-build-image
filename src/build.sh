@@ -13,6 +13,11 @@ if [[ -n "$CI_REGISTRY" && -n "$CI_REGISTRY_USER" ]]; then
   echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
 fi
 
+if [[ -n "$CI_DEPENDENCY_PROXY_SERVER" && -n "$CI_DEPENDENCY_PROXY_USER" ]]; then
+  echo "Logging to GitLab Dependency proxy with CI credentials..."
+  echo "$CI_DEPENDENCY_PROXY_PASSWORD" | docker login -u "$CI_DEPENDENCY_PROXY_USER" --password-stdin "$CI_DEPENDENCY_PROXY_SERVER"
+fi
+
 image_previous="$CI_APPLICATION_REPOSITORY:$CI_COMMIT_BEFORE_SHA"
 image_tagged="$CI_APPLICATION_REPOSITORY:$CI_APPLICATION_TAG"
 image_latest="$CI_APPLICATION_REPOSITORY:latest"
