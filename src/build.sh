@@ -127,10 +127,11 @@ if [[ -n "$DOCKER_BUILDKIT" && "$DOCKER_BUILDKIT" != "0" ]]; then
         --cache-from "$registry_ref"
         --cache-to "type=registry,ref=$registry_ref,mode=$cache_mode"
       )
+      # the docker-container driver is required for this cache type
+      docker buildx create --use
       ;;
   esac
 
-  docker buildx create --use
   docker buildx build \
     "${build_args[@]}" \
     --progress=plain \
