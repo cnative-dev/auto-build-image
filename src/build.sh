@@ -14,7 +14,7 @@ if [[ -n "$CI_REGISTRY" && -n "$CI_REGISTRY_USER" ]]; then
 fi
 
 if [[ -n "$CI_DEPENDENCY_PROXY_SERVER" && -n "$CI_DEPENDENCY_PROXY_USER" ]]; then
-  echo "Logging to GitLab Dependency proxy with CI credentials..."
+  echo "Logging in to GitLab Dependency proxy with CI credentials..."
   echo "$CI_DEPENDENCY_PROXY_PASSWORD" | docker login -u "$CI_DEPENDENCY_PROXY_USER" --password-stdin "$CI_DEPENDENCY_PROXY_SERVER"
 fi
 
