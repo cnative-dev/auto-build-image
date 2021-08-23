@@ -224,6 +224,17 @@ test-custom-dockerfile-should-fail:
     - cd "$CI_PROJECT_DIR/test/ruby_with_custom_dockerfile"
     - /build/build.sh && exit 1 || exit 0
 
+test-dependency-proxy:
+  extends: .test-build
+  variables:
+    DOCKERFILE_PATH: "with_dependency_proxy/Dockerfile"
+  script:
+    - cd "$CI_PROJECT_DIR/test/ruby_with_dockerfile"
+    - /build/build.sh | tee /tmp/build-output
+    - grep "Building Dockerfile-based application using 'with_dependency_proxy/Dockerfile'" /tmp/build-output
+  rules:
+    - if: $CI_MERGE_REQUEST_IID && $CI_PROJECT_PATH == 'gitlab-org/cluster-integration/auto-build-image' && $CI_SERVER_HOST == "gitlab.com"
+
 test-rspec:
   stage: test
   image: "$BUILD_IMAGE_NAME"
