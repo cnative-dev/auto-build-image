@@ -60,11 +60,21 @@ if [[ "$AUTO_DEVOPS_BUILD_IMAGE_CNB_ENABLED" != "false" && ! -f Dockerfile && -z
       env_args+=('--env' "$env_arg_name")
     done
   fi
+  run_image=()
+  if [[ -n "$AUTO_DEVOPS_BUILD_IMAGE_CNB_RUN_IMAGE" ]]; then
+    run_image=('--run-image' "$AUTO_DEVOPS_BUILD_IMAGE_CNB_RUN_IMAGE")
+  fi
+  lifecycle_image=()
+  if [[ -n "$AUTO_DEVOPS_BUILD_IMAGE_CNB_LIFECYCLE_IMAGE" ]]; then
+    lifecycle_image=('--lifecycle-image' "$AUTO_DEVOPS_BUILD_IMAGE_CNB_LIFECYCLE_IMAGE")
+  fi
   pack build tmp-cnb-image \
     --builder "$builder" \
     "${env_args[@]}" \
     "${buildpack_args[@]}" \
     "${volume_args[@]}" \
+    "${run_image[@]}" \
+    "${lifecycle_image[@]}" \
     --env HTTP_PROXY \
     --env http_proxy \
     --env HTTPS_PROXY \
