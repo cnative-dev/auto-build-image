@@ -2,6 +2,19 @@
 
 # build stage script for Auto-DevOps
 
+set -o pipefail
+
+filter_docker_warning() {
+  grep -E -v "^WARNING! Your password will be stored unencrypted in |^Configure a credential helper to remove this warning. See|^https://docs.docker.com/engine/reference/commandline/login/#credentials-store" || true
+}
+
+docker_login_filtered() {
+  # $1 - username, $2 - password, $3 - registry
+  # this filters the stderr of the `docker login`, without merging stdout and stderr together
+  { echo "$2" | docker login -u "$1" --password-stdin "$3" 2>&1 1>&3 | filter_docker_warning 1>&2; } 3>&1  
+}
+
+
 if ! docker info &>/dev/null; then
   if [ -z "$DOCKER_HOST" ] && [ "$KUBERNETES_PORT" ]; then
     export DOCKER_HOST='tcp://localhost:2375'
@@ -10,12 +23,12 @@ fi
 
 if [[ -n "$CI_REGISTRY" && -n "$CI_REGISTRY_USER" ]]; then
   echo "Logging in to GitLab Container Registry with CI credentials..."
-  echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+  docker_login_filtered "$CI_REGISTRY_USER" "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
 fi
 
 if [[ -n "$CI_DEPENDENCY_PROXY_SERVER" && -n "$CI_DEPENDENCY_PROXY_USER" ]]; then
   echo "Logging in to GitLab Dependency proxy with CI credentials..."
-  echo "$CI_DEPENDENCY_PROXY_PASSWORD" | docker login -u "$CI_DEPENDENCY_PROXY_USER" --password-stdin "$CI_DEPENDENCY_PROXY_SERVER"
+  docker_login_filtered "$CI_DEPENDENCY_PROXY_USER" "$CI_DEPENDENCY_PROXY_PASSWORD" "$CI_DEPENDENCY_PROXY_SERVER"
 fi
 
 image_previous="$CI_APPLICATION_REPOSITORY:$CI_COMMIT_BEFORE_SHA"
