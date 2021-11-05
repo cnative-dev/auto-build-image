@@ -19,6 +19,7 @@ test-dockerfile:
     - cd "$CI_PROJECT_DIR/test/ruby_with_dockerfile"
     - /build/build.sh | tee /tmp/build-output
     - grep 'Building Dockerfile-based application...' /tmp/build-output
+    - grep 'CI_APPLICATION_TAG' gl-auto-build-variables.env
 
 test-dockerfile-with-buildkit:
   extends: test-dockerfile
@@ -85,6 +86,10 @@ test-cnb:
     - cd "$CI_PROJECT_DIR/test/ruby"
     - /build/build.sh | tee /tmp/build-output
     - grep 'Building Cloud Native Buildpack-based application with builder' /tmp/build-output
+    - grep 'CI_APPLICATION_TAG' gl-auto-build-variables.env
+  artifacts:
+    reports:
+      dotenv: test/ruby/gl-auto-build-variables.env
 
 test-herokuish-with-buildkit:
   extends: test-herokuish

@@ -35,6 +35,10 @@ image_previous="$CI_APPLICATION_REPOSITORY:$CI_COMMIT_BEFORE_SHA"
 image_tagged="$CI_APPLICATION_REPOSITORY:$CI_APPLICATION_TAG"
 image_latest="$CI_APPLICATION_REPOSITORY:latest"
 
+function gl_write_auto_build_variables_file() {
+  echo "CI_APPLICATION_TAG=$CI_APPLICATION_TAG@$(docker image inspect --format='{{ index (split (index .RepoDigests 0) "@") 1 }}' "$image_tagged")" > gl-auto-build-variables.env
+}
+
 if [[ "$AUTO_DEVOPS_BUILD_IMAGE_CNB_ENABLED" != "false" && ! -f Dockerfile && -z "${DOCKERFILE_PATH}" ]]; then
   builder=${AUTO_DEVOPS_BUILD_IMAGE_CNB_BUILDER:-"heroku/buildpacks:18"}
   echo "Building Cloud Native Buildpack-based application with builder ${builder}..."
@@ -77,6 +81,7 @@ if [[ "$AUTO_DEVOPS_BUILD_IMAGE_CNB_ENABLED" != "false" && ! -f Dockerfile && -z
 
   docker push "$image_tagged"
   docker push "$image_latest"
+  gl_write_auto_build_variables_file
   exit 0
 fi
 
@@ -166,3 +171,5 @@ else
   docker push "$image_tagged"
   docker push "$image_latest"
 fi
+
+gl_write_auto_build_variables_file
