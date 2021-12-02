@@ -198,7 +198,7 @@ test-cnb-with-buildpack-url:
     - grep 'Building Cloud Native Buildpack-based application with builder' /tmp/build-output
     - grep "Using default config from Elixir buildpack" /tmp/build-output
 
-test-cnb-with-volumes:
+test-cnb-with-one-volume:
   extends: .test-build
   variables:
     BUILDPACK_URL: .
@@ -211,6 +211,28 @@ test-cnb-with-volumes:
     - cd "$CI_PROJECT_DIR/test/shell_with_volume"
     - /build/build.sh | tee /tmp/build-output
     - grep 'Successfully mounted a volume' /tmp/build-output
+
+test-cnb-with-multiple-volumes:
+  extends: .test-build
+  variables:
+    BUILDPACK_URL: .
+    SHARED_PATH: $CI_PROJECT_DIR/shared
+    BUILDPACK_VOLUMES: "${SHARED_PATH}1:/volumes/1:ro|${SHARED_PATH}2:/volumes/2:ro|${SHARED_PATH}3:/volumes/3:ro|${SHARED_PATH}4:/volumes/4:ro"
+      # how do we know what we're reading back what was written in before_script?
+    UNIQUE: "$CI_JOB_ID"
+  before_script:
+    - mkdir -p ${SHARED_PATH}1 ${SHARED_PATH}2 ${SHARED_PATH}3 ${SHARED_PATH}4
+    - echo "first volume ${UNIQUE}" > ${SHARED_PATH}1/test
+    - echo "second volume ${UNIQUE}" > ${SHARED_PATH}2/test
+    - echo "third volume ${UNIQUE}" > ${SHARED_PATH}3/test
+    - echo "fourth volume ${UNIQUE}" > ${SHARED_PATH}4/test
+  script:
+    - cd "$CI_PROJECT_DIR/test/shell_with_multiple_volumes"
+    - /build/build.sh | tee /tmp/build-output
+    - grep "first volume ${UNIQUE}" /tmp/build-output
+    - grep "second volume ${UNIQUE}" /tmp/build-output
+    - grep "third volume ${UNIQUE}" /tmp/build-output
+    - grep "fourth volume ${UNIQUE}" /tmp/build-output
 
 test-custom-dockerfile:
   extends: .test-build

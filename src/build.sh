@@ -48,7 +48,10 @@ if [[ "$AUTO_DEVOPS_BUILD_IMAGE_CNB_ENABLED" != "false" && ! -f Dockerfile && -z
   fi
   volume_args=()
   if [[ -n "$BUILDPACK_VOLUMES" ]]; then
-    volume_args=('--volume' "$BUILDPACK_VOLUMES")
+    mapfile -t vol_arg_names < <(echo "$BUILDPACK_VOLUMES" | tr '|' "\n")
+    for vol_arg_name in "${vol_arg_names[@]}"; do
+      volume_args+=('--volume' "$vol_arg_name")
+    done
   fi
   env_args=()
   if [[ -n "$AUTO_DEVOPS_BUILD_IMAGE_FORWARDED_CI_VARIABLES" ]]; then
