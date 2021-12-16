@@ -1,0 +1,9 @@
+api = "0.5"
+
+[buildpack]
+  id       = "echo"
+  version  = "0.1"
+  name     = "Echo"
+
+[[stacks]]
+  id = "heroku-18"
