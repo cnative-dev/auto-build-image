@@ -39,7 +39,7 @@ describe 'Dockerfile.erb' do # rubocop:disable RSpec/DescribeClass
 
     it 'does not use experimental syntax' do
       expect(rendered_dockerfile).not_to match(
-        %r{# syntax = docker\/dockerfile:experimental}
+        %r{# syntax = docker/dockerfile:experimental}
       )
     end
 

@@ -62,7 +62,7 @@ describe BuildSecrets do
     it 'prints #export_string with a trailing newline' do
       stub_const('ENV', env)
       expect { described_class.run }
-        .to(output(build_secrets.export_string + "\n").to_stdout)
+        .to(output("#{build_secrets.export_string}\n").to_stdout)
     end
   end
 end
