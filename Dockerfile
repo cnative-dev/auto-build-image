@@ -1,7 +1,10 @@
+ARG BUILDX_VERSION=0.7.1
 ARG DOCKER_VERSION
 
+FROM docker/buildx-bin:${BUILDX_VERSION} as buildx-bin
 FROM docker:${DOCKER_VERSION}
 
+ARG TARGETARCH
 ARG PACK_VERSION=v0.18.0
 
 RUN apk add --no-cache bash ruby ruby-etc wget
@@ -10,12 +13,7 @@ RUN wget https://github.com/buildpacks/pack/releases/download/${PACK_VERSION}/pa
     rm pack-${PACK_VERSION}-linux.tgz && \
     mv pack /usr/local/bin/pack
 
-ARG TARGETARCH
-ARG BUILDX_VERSION=v0.5.1
-RUN mkdir -p /usr/local/libexec/docker/cli-plugins && \
-    wget https://github.com/docker/buildx/releases/download/${BUILDX_VERSION}/buildx-${BUILDX_VERSION}.linux-${TARGETARCH} \
-      -O /usr/local/libexec/docker/cli-plugins/docker-buildx && \
-    chmod a+x /usr/local/libexec/docker/cli-plugins/docker-buildx
+COPY --from=buildx-bin /buildx /usr/libexec/docker/cli-plugins/docker-buildx
 
 COPY src/ build/
 CMD ["/build/build.sh"]

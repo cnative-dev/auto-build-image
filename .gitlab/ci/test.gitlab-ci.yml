@@ -273,10 +273,9 @@ test-rspec:
 
 test-rubocop:
   stage: test
-  image: ruby:2.7
-  needs: []
+  image: "$BUILD_IMAGE_NAME"
   before_script:
-    - gem install bundler
+    - gem install --no-document bundler
     - bundle install --without test
   script:
     - bundle exec rubocop Gemfile src spec
