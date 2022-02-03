@@ -21,11 +21,19 @@ stages:
   - test-run
   - release
 
+.not-scheduled-scan: &not-scheduled-scan
+  rules:
+    - if: $SCHEDULED_SCAN == null
+
 include:
   - local: .gitlab/ci/build.gitlab-ci.yml
+    <<: *not-scheduled-scan
   - local: .gitlab/ci/test.gitlab-ci.yml
+    <<: *not-scheduled-scan
   - local: .gitlab/ci/test-run.gitlab-ci.yml
+    <<: *not-scheduled-scan
   - local: .gitlab/ci/release.gitlab-ci.yml
+    <<: *not-scheduled-scan
   - template: Security/Container-Scanning.gitlab-ci.yml
 
 container_scanning:
