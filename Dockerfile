@@ -5,7 +5,7 @@ FROM docker/buildx-bin:${BUILDX_VERSION} as buildx-bin
 FROM docker:${DOCKER_VERSION}
 
 ARG TARGETARCH
-ARG PACK_VERSION=v0.18.0
+ARG PACK_VERSION=v0.23.0
 
 RUN apk add --no-cache bash ruby ruby-etc wget
 RUN wget https://github.com/buildpacks/pack/releases/download/${PACK_VERSION}/pack-${PACK_VERSION}-linux.tgz && \
