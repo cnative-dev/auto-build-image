@@ -40,6 +40,7 @@ the conventions of [Conventional Commits (v1.0.0)](https://www.conventionalcommi
 
 - Commit messages starting with `fix: ` trigger a patch version bump
 - Commit messages starting with `feat: ` trigger a minor version bump
+- Commit messages starting with `ci: ` trigger a `ci` change without a version bump.
 - Commit messages starting with `BREAKING CHANGE: ` trigger a major version bump.
 
 ### Tip: Test commit messages locally
