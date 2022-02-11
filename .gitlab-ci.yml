@@ -36,6 +36,25 @@ include:
     <<: *not-scheduled-scan
   - template: Security/Container-Scanning.gitlab-ci.yml
 
+
+appsec_container_scanning:
+  stage: test
+  image: ruby:3
+  environment:
+    name: appsec_container_scanning
+    action: prepare
+  before_script:
+    - cd ci
+    - bundle install
+  script:
+    - ./appsec-container-scan "${BUILD_IMAGE_NAME}" > gl-container-scanning-report.json
+  artifacts:
+    reports:
+      container_scanning: ci/gl-container-scanning-report.json
+  rules: 
+    # Skip on forks, because external contributors can't run this pipeline
+    - if: $CONTAINER_SCAN_PIPELINE_TRIGGER_TOKEN
+
 container_scanning:
   variables:
     DOCKER_IMAGE: "${BUILD_IMAGE_NAME}"
