@@ -189,7 +189,7 @@ test-cnb-with-buildpack-url:
       name = "Elixir"
 
       [[stacks]]
-      id = "heroku-18"
+      id = "heroku-20"
       TOML
     - bin/install buildpack.toml https://buildpack-registry.s3.amazonaws.com/buildpacks/hashnuke/elixir.tgz
   script:

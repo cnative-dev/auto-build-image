@@ -5,7 +5,7 @@ FROM docker/buildx-bin:${BUILDX_VERSION} as buildx-bin
 FROM docker:${DOCKER_VERSION}
 
 ARG TARGETARCH
-ARG PACK_VERSION=v0.23.0
+ARG PACK_VERSION=v0.24.0
 
 RUN apk upgrade --available --no-cache && \
      apk add --no-cache bash ruby ruby-etc wget
