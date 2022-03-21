@@ -40,7 +40,7 @@ function gl_write_auto_build_variables_file() {
 }
 
 if [[ "$AUTO_DEVOPS_BUILD_IMAGE_CNB_ENABLED" != "false" && ! -f Dockerfile && -z "${DOCKERFILE_PATH}" ]]; then
-  builder=${AUTO_DEVOPS_BUILD_IMAGE_CNB_BUILDER:-"heroku/buildpacks:18"}
+  builder=${AUTO_DEVOPS_BUILD_IMAGE_CNB_BUILDER:-"heroku/buildpacks:20"}
   echo "Building Cloud Native Buildpack-based application with builder ${builder}..."
   buildpack_args=()
   if [[ -n "$BUILDPACK_URL" ]]; then

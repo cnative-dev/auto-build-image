@@ -6,4 +6,4 @@ api = "0.5"
   name     = "Echo"
 
 [[stacks]]
-  id = "heroku-18"
+  id = "heroku-20"
