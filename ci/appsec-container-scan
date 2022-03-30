@@ -47,14 +47,15 @@ def merge_appsec_container_scanning_artifacts(pipeline, job_names)
     next unless job_names.include?(job.name)
 
     STDERR.puts "Downloading report artifact for job '#{job.name}' (ID #{job.id})"
-    data = Gitlab.download_job_artifact_file(PROJECT_ID, job.id, 'gl-container-scanning-report.json').to_h
+    file = Gitlab.download_job_artifact_file(PROJECT_ID, job.id, 'gl-container-scanning-report.json')
+    data = JSON.parse(file.read, symbolize_names: true)
 
-    version ||= data['version']
-    remediations.concat(data['remediations'])
-    vulnerabilities.concat(data['vulnerabilities'])
+    version ||= data[:version]
+    remediations.concat(data[:remediations])
+    vulnerabilities.concat(data[:vulnerabilities])
   end
 
-  { 'version' => version, 'remediations' => remediations, 'vulnerabilities' => vulnerabilities }
+  { version: version, remediations: remediations, vulnerabilities: vulnerabilities }
 end
 
 def main(image)
