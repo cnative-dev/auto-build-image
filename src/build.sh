@@ -41,6 +41,7 @@ function gl_write_auto_build_variables_file() {
 
 if [[ "$AUTO_DEVOPS_BUILD_IMAGE_CNB_ENABLED" != "false" && ! -f Dockerfile && -z "${DOCKERFILE_PATH}" ]]; then
   builder=${AUTO_DEVOPS_BUILD_IMAGE_CNB_BUILDER:-"heroku/buildpacks:20"}
+  default_port=${AUTO_DEVOPS_BUILD_IMAGE_CNB_PORT:-"5000"}
   echo "Building Cloud Native Buildpack-based application with builder ${builder}..."
   buildpack_args=()
   if [[ -n "$BUILDPACK_URL" ]]; then
@@ -83,15 +84,18 @@ if [[ "$AUTO_DEVOPS_BUILD_IMAGE_CNB_ENABLED" != "false" && ! -f Dockerfile && -z
     --env ftp_proxy \
     --env NO_PROXY \
     --env no_proxy
-
-  cp /build/cnb.Dockerfile Dockerfile
-
-  docker build \
-    --build-arg source_image=tmp-cnb-image \
-    --tag "$image_tagged" \
-    --tag "$image_latest" \
-    .
-
+  if [[ "$default_port" != "false" ]]; then
+    cp /build/cnb.Dockerfile Dockerfile
+    docker build \
+      --build-arg source_image=tmp-cnb-image \
+      --build-arg default_port="${default_port}" \
+      --tag "$image_tagged" \
+      --tag "$image_latest" \
+      .
+  else
+    docker tag tmp-cnb-image "$image_tagged"
+    docker tag tmp-cnb-image "$image_latest"
+  fi
   docker push "$image_tagged"
   docker push "$image_latest"
   gl_write_auto_build_variables_file
