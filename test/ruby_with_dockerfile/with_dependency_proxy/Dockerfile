@@ -3,7 +3,8 @@ FROM gitlab.com:443/gitlab-org/cluster-integration/dependency_proxy/containers/r
 WORKDIR /usr/src/app
 
 COPY Gemfile Gemfile.lock ./
-RUN bundle install
+RUN bundle config set --local frozen 'true' && \
+    bundle install
 COPY . ./
 
 ENV PORT 5000

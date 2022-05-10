@@ -47,6 +47,7 @@ appsec_container_scanning:
     action: prepare
   before_script:
     - cd ci
+    - bundle config set --local frozen 'true'
     - bundle install
   script:
     - ./appsec-container-scan "${BUILD_IMAGE_NAME}" > gl-container-scanning-report.json

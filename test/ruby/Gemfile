@@ -1,6 +1,7 @@
 source 'https://rubygems.org'
 gem 'rack'
 gem 'rake'
+gem 'puma'
 
 # These are printed here for testing environment variable forwarding. We expect the Gemfile
 # to be evaluated as code during build, so by printing these here we should see them in the
