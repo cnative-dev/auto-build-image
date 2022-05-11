@@ -1,9 +1,10 @@
-FROM ruby:2.5.3-alpine
+FROM ruby:3.0.4-alpine
 
 WORKDIR /usr/src/app
 
 COPY Gemfile Gemfile.lock ./
-RUN bundle install
+RUN bundle config set --local frozen 'true' && \
+    bundle install
 COPY . ./
 
 ENV PORT 5000
