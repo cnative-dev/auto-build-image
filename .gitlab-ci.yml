@@ -10,7 +10,7 @@ variables:
   # explicit tag to be used within pipeline
   BUILD_IMAGE_NAME: "$CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG:$CI_COMMIT_SHA"
 
-  DOCKER_VERSION: 20.10.14
+  DOCKER_VERSION: 20.10.17
   BUILDX_VERSION: v0.8.2
   PACK_VERSION: v0.27.0
 
@@ -54,7 +54,7 @@ appsec_container_scanning:
   artifacts:
     reports:
       container_scanning: ci/gl-container-scanning-report.json
-  rules: 
+  rules:
     # Skip on forks, because external contributors can't run this pipeline
     - if: $CONTAINER_SCAN_PIPELINE_TRIGGER_TOKEN
 

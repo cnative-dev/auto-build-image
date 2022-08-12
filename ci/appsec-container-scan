@@ -51,7 +51,7 @@ def merge_appsec_container_scanning_artifacts(pipeline, job_names)
     data = JSON.parse(file.read, symbolize_names: true)
 
     version ||= data[:version]
-    remediations.concat(data[:remediations])
+    remediations.concat(data.fetch(:remediations, []))
     vulnerabilities.concat(data[:vulnerabilities])
   end
 
