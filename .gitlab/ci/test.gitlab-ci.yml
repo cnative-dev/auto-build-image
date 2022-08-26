@@ -19,7 +19,7 @@ test-dockerfile:
     - cd "$CI_PROJECT_DIR/test/ruby_with_dockerfile"
     - /build/build.sh | tee /tmp/build-output
     - grep 'Building Dockerfile-based application...' /tmp/build-output
-    - grep 'CI_APPLICATION_TAG' gl-auto-build-variables.env
+    - grep -E "^CI_APPLICATION_TAG=$CI_APPLICATION_TAG@sha256:[a-z0-9]{64}$" gl-auto-build-variables.env
 
 test-dockerfile-with-buildkit:
   extends: test-dockerfile
@@ -46,11 +46,13 @@ test-dockerfile-with-registry-cache:
   variables:
     DOCKER_BUILDKIT: 1
     AUTO_DEVOPS_BUILD_CACHE: registry
+    AUTO_DEVOPS_BUILD_IMAGE_EXTRA_ARGS: --platform=linux/amd64,linux/arm64
   script:
     - cd "$CI_PROJECT_DIR/test/ruby_with_dockerfile"
     - /build/build.sh | tee /tmp/build-output
     - grep 'writing config' /tmp/build-output
     - grep 'writing manifest' /tmp/build-output
+    - grep -E "^CI_APPLICATION_TAG=$CI_APPLICATION_TAG@sha256:[a-z0-9]{64}$" gl-auto-build-variables.env
 
 test-dockerfile-with-inline-cache:
   extends: test-dockerfile
@@ -79,6 +81,9 @@ test-herokuish:
     - cd "$CI_PROJECT_DIR/test/ruby"
     - /build/build.sh | tee /tmp/build-output
     - grep 'Building Heroku-based application using gliderlabs/herokuish docker image...' /tmp/build-output
+  artifacts:
+    reports:
+      dotenv: test/ruby/gl-auto-build-variables.env
 
 test-cnb:
   extends: .test-build
@@ -86,7 +91,7 @@ test-cnb:
     - cd "$CI_PROJECT_DIR/test/ruby"
     - /build/build.sh | tee /tmp/build-output
     - grep 'Building Cloud Native Buildpack-based application with builder' /tmp/build-output
-    - grep 'CI_APPLICATION_TAG' gl-auto-build-variables.env
+    - grep -E "^CI_APPLICATION_TAG=$CI_APPLICATION_TAG@sha256:[a-z0-9]{64}$" gl-auto-build-variables.env
   artifacts:
     reports:
       dotenv: test/ruby/gl-auto-build-variables.env

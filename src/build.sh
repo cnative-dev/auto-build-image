@@ -35,8 +35,8 @@ image_previous="$CI_APPLICATION_REPOSITORY:$CI_COMMIT_BEFORE_SHA"
 image_tagged="$CI_APPLICATION_REPOSITORY:$CI_APPLICATION_TAG"
 image_latest="$CI_APPLICATION_REPOSITORY:latest"
 
-function gl_write_auto_build_variables_file() {
-  echo "CI_APPLICATION_TAG=$CI_APPLICATION_TAG@$(docker image inspect --format='{{ index (split (index .RepoDigests 0) "@") 1 }}' "$image_tagged")" > gl-auto-build-variables.env
+gl_write_auto_build_variables_file() {
+  echo "CI_APPLICATION_TAG=${CI_APPLICATION_TAG}@$(docker buildx imagetools inspect "$image_tagged" | grep ^Digest: | awk '{print $2}')" > gl-auto-build-variables.env
 }
 
 if [[ "$AUTO_DEVOPS_BUILD_IMAGE_CNB_ENABLED" != "false" && ! -f Dockerfile && -z "${DOCKERFILE_PATH}" ]]; then
