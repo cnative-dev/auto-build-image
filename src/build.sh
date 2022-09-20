@@ -69,13 +69,17 @@ if [[ "$AUTO_DEVOPS_BUILD_IMAGE_CNB_ENABLED" != "false" && ! -f Dockerfile && -z
   if [[ -n "$AUTO_DEVOPS_BUILD_IMAGE_CNB_LIFECYCLE_IMAGE" ]]; then
     lifecycle_image=('--lifecycle-image' "$AUTO_DEVOPS_BUILD_IMAGE_CNB_LIFECYCLE_IMAGE")
   fi
-  pack build tmp-cnb-image \
+  pack build "${CI_APPLICATION_REPOSITORY}" \
     --builder "$builder" \
     "${env_args[@]}" \
     "${buildpack_args[@]}" \
     "${volume_args[@]}" \
     "${run_image[@]}" \
     "${lifecycle_image[@]}" \
+    --publish \
+    --tag "${image_tagged}" \
+    --cache-image "${image_previous}" \
+    --creation-time "now"
     --env HTTP_PROXY \
     --env http_proxy \
     --env HTTPS_PROXY \
@@ -84,20 +88,6 @@ if [[ "$AUTO_DEVOPS_BUILD_IMAGE_CNB_ENABLED" != "false" && ! -f Dockerfile && -z
     --env ftp_proxy \
     --env NO_PROXY \
     --env no_proxy
-  if [[ "$default_port" != "false" ]]; then
-    cp /build/cnb.Dockerfile Dockerfile
-    docker build \
-      --build-arg source_image=tmp-cnb-image \
-      --build-arg default_port="${default_port}" \
-      --tag "$image_tagged" \
-      --tag "$image_latest" \
-      .
-  else
-    docker tag tmp-cnb-image "$image_tagged"
-    docker tag tmp-cnb-image "$image_latest"
-  fi
-  docker push "$image_tagged"
-  docker push "$image_latest"
   gl_write_auto_build_variables_file
   exit 0
 fi
