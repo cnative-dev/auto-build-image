@@ -10,7 +10,7 @@ variables:
   # explicit tag to be used within pipeline
   BUILD_IMAGE_NAME: "$CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG:$CI_COMMIT_SHA"
 
-  DOCKER_VERSION: 20.10.20
+  DOCKER_VERSION: 20.10.21
   BUILDX_VERSION: v0.9.1
   PACK_VERSION: v0.27.0
 
