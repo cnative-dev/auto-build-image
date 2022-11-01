@@ -83,7 +83,7 @@ if [[ "$AUTO_DEVOPS_BUILD_IMAGE_CNB_ENABLED" != "false" && ! -f Dockerfile && -z
     --publish \
     --tag "${image_tagged}" \
     --cache-image "${image_previous}" \
-    --creation-time "now"
+    --creation-time "now" \
     --env HTTP_PROXY \
     --env http_proxy \
     --env HTTPS_PROXY \
