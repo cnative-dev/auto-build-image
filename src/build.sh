@@ -69,6 +69,7 @@ if [[ "$AUTO_DEVOPS_BUILD_IMAGE_CNB_ENABLED" != "false" && ! -f Dockerfile && -z
   if [[ -n "$AUTO_DEVOPS_BUILD_IMAGE_CNB_LIFECYCLE_IMAGE" ]]; then
     lifecycle_image=('--lifecycle-image' "$AUTO_DEVOPS_BUILD_IMAGE_CNB_LIFECYCLE_IMAGE")
   fi
+  pack config registry-mirrors add '*' --mirror https://docker-io.cluster.cnative.dev
   pack build "${CI_APPLICATION_REPOSITORY}" \
     --builder "$builder" \
     "${env_args[@]}" \
