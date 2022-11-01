@@ -69,7 +69,10 @@ if [[ "$AUTO_DEVOPS_BUILD_IMAGE_CNB_ENABLED" != "false" && ! -f Dockerfile && -z
   if [[ -n "$AUTO_DEVOPS_BUILD_IMAGE_CNB_LIFECYCLE_IMAGE" ]]; then
     lifecycle_image=('--lifecycle-image' "$AUTO_DEVOPS_BUILD_IMAGE_CNB_LIFECYCLE_IMAGE")
   fi
-  pack config registry-mirrors add '*' --mirror https://docker-io.cluster.cnative.dev
+  pack config registry-mirrors add 'registry-1.docker.io' --mirror https://docker-io.cluster.cnative.dev
+  pack config registry-mirrors add 'gcr.io' --mirror https://gcr-io.cluster.cnative.dev
+  pack config registry-mirrors add 'ghcr.io' --mirror https://ghcr-io.cluster.cnative.dev
+  pack config registry-mirrors add 'quay.io' --mirror https://quay-io.cluster.cnative.dev
   pack build "${CI_APPLICATION_REPOSITORY}" \
     --builder "$builder" \
     "${env_args[@]}" \
