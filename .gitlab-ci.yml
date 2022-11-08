@@ -38,25 +38,23 @@ include:
     <<: *not-scheduled-scan
   - template: Security/Container-Scanning.gitlab-ci.yml
 
-
+# enable container scanning with https://gitlab.com/gitlab-com/gl-security/appsec/container-scanners
 appsec_container_scanning:
   stage: test
-  image: ruby:3
+  image: registry.gitlab.com/gitlab-com/gl-security/appsec/container-scanners:latest
   environment:
     name: appsec_container_scanning
     action: prepare
-  before_script:
-    - cd ci
-    - bundle config set --local frozen 'true'
-    - bundle install
   script:
-    - ./appsec-container-scan "${BUILD_IMAGE_NAME}" > gl-container-scanning-report.json
+    - /run/appsec-container-scan "${BUILD_IMAGE_NAME}" > gl-container-scanning-report.json
   artifacts:
     reports:
-      container_scanning: ci/gl-container-scanning-report.json
+      container_scanning: gl-container-scanning-report.json
   rules:
     # Skip on forks, because external contributors can't run this pipeline
     - if: $CONTAINER_SCAN_PIPELINE_TRIGGER_TOKEN
+      allow_failure: true
+
 
 container_scanning:
   variables:
