@@ -71,6 +71,7 @@ if [[ "$AUTO_DEVOPS_BUILD_IMAGE_CNB_ENABLED" != "false" && ! -f Dockerfile && -z
   fi
   pack build "${CI_APPLICATION_REPOSITORY}" \
     --builder "$builder" \
+    --pull-policy "if-not-present" \
     "${env_args[@]}" \
     "${buildpack_args[@]}" \
     "${volume_args[@]}" \
